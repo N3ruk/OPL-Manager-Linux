@@ -10,7 +10,7 @@ Automated tests do not establish physical PS2 compatibility. No game, VMC or loa
 
 ## Release checks recorded on 2026-11-02
 
-- **98 regression tests passed** in an isolated Ubuntu 22.04 environment.
+- **100 regression tests passed** in an isolated Ubuntu 22.04 environment.
 - AppImage normal launch, FUSE-free execution, version and isolated self-test passed.
 - AppImage self-test passed on pristine Ubuntu Base 22.04 without Python/Qt installed.
 - Packaged Qt window/theme checks passed with offscreen and X11/Xvfb.

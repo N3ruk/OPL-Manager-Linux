@@ -30,6 +30,13 @@ class CoreTests(unittest.TestCase):
     def tearDown(self):self.tmp.cleanup()
     def game(self):
         p=make_iso(self.root/'DVD/game.iso');return c.inspect_game(p,self.root,c.game_database())
+    def test_bundled_lz4_without_system_cache(self):
+        with patch('ctypes.util.find_library',return_value=None):
+            codec=c.Lz4();raw=b'portable LZ4'*200
+            self.assertEqual(codec.decompress(codec.compress(raw),len(raw)),raw)
+    def test_missing_lz4_has_actionable_error(self):
+        with patch('ctypes.util.find_library',return_value=None),patch('ctypes.CDLL',side_effect=OSError('not installed')):
+            with self.assertRaisesRegex(RuntimeError,'liblz4'):c.Lz4()
     def test_id_formats(self):
         for s in ['SLES_526.78','sles-52678','SLES 52678']:self.assertEqual(c.normalize_id(s),'SLES_526.78')
     def test_reject_path_as_id(self):

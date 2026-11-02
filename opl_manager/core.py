@@ -91,9 +91,12 @@ def directory(root: Path, name: str) -> Path:
 
 class Lz4:
     def __init__(self):
-        lib = ctypes.util.find_library('lz4')
-        if not lib: raise RuntimeError('Falta liblz4 en este equipo.')
-        self.lib = ctypes.CDLL(lib)
+        # A bundled library need not appear in the host ldconfig cache.
+        lib = ctypes.util.find_library('lz4') or 'liblz4.so.1'
+        try:
+            self.lib = ctypes.CDLL(lib)
+        except OSError as error:
+            raise RuntimeError('Falta liblz4 en este equipo.') from error
         self.lib.LZ4_compressBound.argtypes = [ctypes.c_int]
         self.lib.LZ4_compressBound.restype = ctypes.c_int
         self.lib.LZ4_compress_default.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int, ctypes.c_int]

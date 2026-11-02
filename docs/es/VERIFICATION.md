@@ -10,7 +10,7 @@ Las pruebas automatizadas no acreditan compatibilidad física PS2. No se ha vali
 
 ## Comprobaciones de publicación — 2026-11-02
 
-- **98 pruebas superadas** en Ubuntu 22.04 aislado.
+- **100 pruebas superadas** en Ubuntu 22.04 aislado.
 - AppImage normal, sin FUSE, versión y autocomprobación correctas.
 - AppImage probada en Ubuntu Base 22.04 limpio sin Python/Qt instalados.
 - Ventana/temas Qt comprobados en offscreen y X11/Xvfb.
