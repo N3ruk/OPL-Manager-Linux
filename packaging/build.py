@@ -59,15 +59,21 @@ Description: Native Linux library manager for Open PS2 Loader
  Includes Python, Qt, Pillow, LZ4 and support libraries.
  Manage game libraries, artwork, CFG/CHT, VMC and CD/DVD indexes.
 ''')
- out=DIST/f'opl-manager-linux_{VERSION}_amd64.deb';run(['dpkg-deb','--root-owner-group','--build',stage,out]);return out
+ out=DIST/f'opl-manager-linux_{VERSION}_amd64.deb';pending=out.with_suffix('.deb.pending');run(['dpkg-deb','--root-owner-group','--build',stage,pending]);pending.replace(out);return out
 def appimage():
  if platform.machine()!='x86_64':raise RuntimeError('AppImage build requires x86_64')
  specs=json.loads((ROOT/'packaging/toolchain-lock.json').read_text());tools={k:fetch(v) for k,v in specs.items()}
- if not (CACHE/'python/bin/python3').exists():
+ if not (CACHE/'python/.extraction-complete').exists():
   with tarfile.open(tools['python']) as tf:
    for m in tf.getmembers():
-    if not (CACHE/m.name).resolve().is_relative_to(CACHE.resolve()):raise RuntimeError('Unsafe tar path')
-   tf.extractall(CACHE,**({'filter':'data'} if hasattr(tarfile,'data_filter') else {}))
+    target=(CACHE/m.name).resolve()
+    if not target.is_relative_to(CACHE.resolve()):raise RuntimeError('Unsafe tar path')
+    if m.issym() or m.islnk():
+     link=((target.parent if m.issym() else CACHE)/m.linkname).resolve()
+     if not link.is_relative_to(CACHE.resolve()):raise RuntimeError('Unsafe tar link')
+  # GNU tar handles safe relative terminfo symlinks consistently on Python 3.10+.
+  run(['tar','--no-same-owner','-xzf',tools['python'],'-C',CACHE])
+  (CACHE/'python/.extraction-complete').touch()
  wheels=CACHE/'wheels';wheels.mkdir(exist_ok=True)
  run([CACHE/'python/bin/python3','-m','pip','download','--require-hashes','--dest',wheels,'-r',ROOT/'packaging/requirements-appimage.txt'])
  if not (BASE/'usr/bin/ldd').exists():run([sys.executable,ROOT/'packaging/prepare_rootfs.py'])
