@@ -59,7 +59,7 @@ Description: Native Linux library manager for Open PS2 Loader
  Includes Python, Qt, Pillow, LZ4 and support libraries.
  Manage game libraries, artwork, CFG/CHT, VMC and CD/DVD indexes.
 ''')
- out=DIST/f'opl-manager-linux_{VERSION}_amd64.deb';pending=out.with_suffix('.deb.pending');run(['dpkg-deb','-Zzstd','-z10','--root-owner-group','--build',stage,pending]);pending.replace(out);return out
+ out=DIST/f'opl-manager-linux_{VERSION}_amd64.deb';pending=out.with_suffix('.deb.pending');run(['dpkg-deb','-Zzstd','-z9','--root-owner-group','--build',stage,pending]);pending.replace(out);return out
 def appimage():
  if platform.machine()!='x86_64':raise RuntimeError('AppImage build requires x86_64')
  specs=json.loads((ROOT/'packaging/toolchain-lock.json').read_text());tools={k:fetch(v) for k,v in specs.items()}
