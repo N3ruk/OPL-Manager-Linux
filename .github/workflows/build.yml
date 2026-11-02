@@ -1,0 +1,29 @@
+name: Build and verify Linux packages
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build and GUI-test requirements
+        run: sudo apt-get update && sudo apt-get install -y bubblewrap xvfb xauth binutils
+      - name: Build all packages
+        run: python3 packaging/build.py
+      - name: Regression tests with bundled runtime
+        run: QT_QPA_PLATFORM=offscreen LD_LIBRARY_PATH="$PWD/build/OPL-Manager-Linux.AppDir/usr/lib" build/OPL-Manager-Linux.AppDir/usr/python/bin/python3 -m unittest discover -s tests -v
+      - name: AppImage checks without FUSE
+        run: |
+          ./dist/OPL-Manager-Linux-1.0.0-x86_64.AppImage --appimage-extract-and-run --version
+          xvfb-run -a ./dist/OPL-Manager-Linux-1.0.0-x86_64.AppImage --appimage-extract-and-run --self-test
+          (cd dist && sha256sum -c SHA256SUMS)
+      - name: DEB installation, self-check and removal
+        run: |
+          sudo apt-get install -y ./dist/opl-manager-linux_1.0.0_amd64.deb
+          xvfb-run -a opl-manager-linux --self-test
+          sudo apt-get purge -y opl-manager-linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OPL-Manager-Linux-1.0.0
+          path: dist/*

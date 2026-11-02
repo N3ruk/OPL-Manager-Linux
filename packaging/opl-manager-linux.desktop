@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OPL Manager Linux
+Comment=Manage Open PS2 Loader games, artwork and configuration
+Comment[es]=Gestiona juegos, carátulas y configuración de Open PS2 Loader
+Exec=opl-manager-linux
+Icon=opl-manager-linux
+Terminal=false
+Categories=Game;
+Keywords=PS2;OPL;PlayStation;ISO;ZSO;
+StartupNotify=true
+StartupWMClass=OPL Manager Linux

@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+APPDIR=$(CDPATH= cd -- "$(dirname -- "$(readlink -f -- "$0")")" && pwd)
+export PYTHONHOME="$APPDIR/usr/python"
+export PYTHONNOUSERSITE=1
+export PYTHONDONTWRITEBYTECODE=1
+unset PYTHONPATH
+export LD_LIBRARY_PATH="$APPDIR/usr/lib:$APPDIR/usr/python/lib:$APPDIR/usr/python/lib/python3.12/site-packages/PyQt6/Qt6/lib"
+export QT_PLUGIN_PATH="$APPDIR/usr/python/lib/python3.12/site-packages/PyQt6/Qt6/plugins"
+export QT_QPA_PLATFORM_PLUGIN_PATH="$QT_PLUGIN_PATH/platforms"
+export FONTCONFIG_FILE="$APPDIR/usr/share/opl-manager-linux/fonts.conf"
+export SSL_CERT_FILE="$APPDIR/usr/share/opl-manager-linux/ca-certificates.crt"
+cd "$APPDIR/usr/share/opl-manager-linux"
+exec "$APPDIR/usr/python/bin/python3" -B -s -m opl_manager "$@"

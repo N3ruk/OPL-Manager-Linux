@@ -1,0 +1,15 @@
+original/
+.cache/
+build/
+dist/
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+# Keep private diagnostics and historical screenshots local.
+docs/*
+!docs/USAGE.md
+!docs/BUILD.md
+!docs/VERIFICATION.md
+!docs/screenshot.png
+!docs/es/
