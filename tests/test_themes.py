@@ -32,6 +32,8 @@ class ThemeTests(unittest.TestCase):
         self.assertEqual([a.text() for a in w.theme_menu.actions()],list(THEMES.values()))
         self.assertEqual(ui.PROFILES[64],'OPL legacy · 92bytes/juego')
         self.assertFalse(any('sin windows' in l.text().lower() for l in w.findChildren(QLabel)))
+        self.assertIn('v1.0.0',[l.text() for l in w.findChildren(QLabel)])
+        self.assertFalse(any('no oficial' in l.text().lower() for l in w.findChildren(QLabel)))
     def test_menu_switches_live_exclusively_and_updates_open_dialog(self):
         make_iso(self.root/'DVD/test.iso');ui.create_folders(self.root)
         from opl_manager.core import inspect_game
@@ -42,6 +44,10 @@ class ThemeTests(unittest.TestCase):
             self.assertEqual(w.theme,key)
             self.assertEqual([k for k,a in w.theme_actions.items() if a.isChecked()],[key])
             self.assertEqual(d.palette().color(QPalette.ColorRole.Window).name(),PALETTES[key]['background'])
+            # The native Wayland decoration reads the application-wide palette.
+            self.assertLess(app.palette().color(QPalette.ColorRole.Window).lightness(),80)
+            self.assertGreater(app.palette().color(QPalette.ColorRole.WindowText).lightness(),180)
+            self.assertEqual(w.palette().color(QPalette.ColorRole.Window).name(),PALETTES[key]['background'])
             self.assertEqual(json.loads(ui.CONFIG.read_text())['theme'],key)
         self.assertEqual(len(styles),5);d.close()
     def test_theme_library_and_unknown_settings_survive_reload(self):

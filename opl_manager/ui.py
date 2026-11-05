@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (QApplication,QMainWindow,QWidget,QFrame,QLabel,QPus
     QScrollArea,QSizePolicy,QMenu)
 from . import __version__
 from .themes import DEFAULT_THEME,THEMES,PALETTES,theme_key,stylesheet
+from .window_theme import apply_native_palette
 from .cfg_ui import CfgEditor
 from .art_ui import ArtDialog,BatchArtOptions
 from .art import download_art_batch
@@ -146,7 +147,7 @@ class MainWindow(QMainWindow):
         self.index_btn=button('Índice avanzado…',self.generate_game_indexes);self.index_btn.setObjectName('nav');sl.addWidget(self.index_btn)
         self.index_btn.setToolTip('Los índices de 92 bytes se generan automáticamente. Este control permite elegir manualmente otro perfil.')
         sl.addStretch();sl.addWidget(label('○  △  ×  □','eyebrow'));sl.addSpacing(10)
-        foot=label('Tu biblioteca.\nTu consola.','muted');sl.addWidget(foot);sl.addSpacing(16);sl.addWidget(label('v'+__version__+' · No oficial','muted'));outer.addWidget(side)
+        foot=label('Tu biblioteca.\nTu consola.','muted');sl.addWidget(foot);sl.addSpacing(16);sl.addWidget(label('v'+__version__,'muted'));outer.addWidget(side)
         main=QWidget();ml=QVBoxLayout(main);ml.setContentsMargins(26,27,26,18);ml.setSpacing(16);outer.addWidget(main,1)
         header=QHBoxLayout();titlebox=QVBoxLayout();titlebox.setSpacing(3);titlebox.addWidget(label('PLAYSTATION 2  /  OPEN PS2 LOADER','eyebrow'));titlebox.addWidget(label('Tu colección, a punto.','heading'));titlebox.addWidget(label('Juegos, carátulas y configuración en un solo lugar.','muted'));header.addLayout(titlebox,1)
         self.choose_btn=button('＋  Abrir biblioteca',self.choose_folder,True);header.addWidget(self.choose_btn,alignment=Qt.AlignmentFlag.AlignVCenter);ml.addLayout(header)
@@ -210,6 +211,13 @@ class MainWindow(QMainWindow):
             palette.setColor(getattr(QPalette.ColorRole,role),QColor(colors[color]))
         for role in ('Text','ButtonText','WindowText'):
             palette.setColor(QPalette.ColorGroup.Disabled,getattr(QPalette.ColorRole,role),QColor(colors['disabled_text']))
+        native_palette=QPalette(palette)
+        if self.theme=='classic':
+            # Keep the classic light content, but retain dark native chrome.
+            for role,color in [('Window','background'),('WindowText','text')]:
+                native_palette.setColor(getattr(QPalette.ColorRole,role),QColor(PALETTES[DEFAULT_THEME][color]))
+            native_palette.setColor(QPalette.ColorGroup.Disabled,QPalette.ColorRole.WindowText,QColor(PALETTES[DEFAULT_THEME]['disabled_text']))
+        apply_native_palette(QApplication.instance(),native_palette)
         self.setPalette(palette);self.setStyleSheet(stylesheet(self.theme))
         self.mark.setStyleSheet(f"font-size: 49px; font-weight: 300; color: {colors['mark']}; letter-spacing: 3px;")
         self.issue.setStyleSheet(f"color: {colors['warning']}; font-size: 11px;")
